@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+  <!-- Site Properties -->
+  <title>一起来钓鱼</title>
+  <link rel="icon" href="/images/fish_ico_red.ico" />
+
+  <link rel="stylesheet" type="text/css" href="/dist/semantic.css" />
+  <style type="text/css">
+    .ui.bar.segment {
+      background-color: lightskyblue;
+    }
+
+    .ui.label {
+      font-size: large;
+    }
+
+    .ui.secondary.menu {
+      margin-left: 50px;
+    }
+
+    .ui.secondary.menu .front.item {
+      margin-left: 40px;
+    }
+
+    body {
+      /* background-color: #eeeeee; */
+      background-color: #FFE4B5;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="ui segments">
+    <div class="ui bar segment">
+      <div id="fish_state" style="display: none;"><%= fishInfo.fish_state %></div>
+      <div id="fish_size" style="display: none;"><%= fishInfo.fish_size %></div>
+      <div id="fish_color" style="display: none;"><%= fishInfo.fish_color %></div>
+      <div class="ui secondary menu">
+        <a class="front down item" onclick="window.location.href='/'">
+          <div class="ui green horizontal label">
+            主页
+          </div>
+        </a>
+        <a class="front down item" onclick="window.location.href='/fishPool'">
+          <div class="ui green horizontal label">
+            鱼塘
+          </div>
+        </a>
+        <a class="front down item">
+          <div class="ui red horizontal label">
+            市场
+          </div>
+        </a>
+        <a class="front down item" onclick="window.location.href='/myFish'">
+          <div class="ui green horizontal label">
+            仓库
+          </div>
+        </a>
+        <div class="right menu">
+          <div class="item">
+            余额：<b id="myBalance"><%= myBalance %></b> &nbsp ether
+          </div>
+          <div class="down item">
+            <div class="ui primary">
+              当前用户：
+              <div id="account" style="display: none;"><%= account %></div>
+              <select class="ui dropdown" id="select_account">
+                <% if(parseInt(account)==1){ %>
+                <option value="1" selected="selected">1</option>
+                <% }else{ %>
+                <option value="1">1</option>
+                <% } %>
+
+                <% if(parseInt(account)==2){ %>
+                <option value="2" selected="selected">2</option>
+                <% }else{ %>
+                <option value="2">2</option>
+                <% } %>
+
+                <% if(parseInt(account)==3){ %>
+                <option value="3" selected="selected">3</option>
+                <% }else{ %>
+                <option value="3">3</option>
+                <% } %>
+
+                <% if(parseInt(account)==4){ %>
+                <option value="4" selected="selected">4</option>
+                <% }else{ %>
+                <option value="4">4</option>
+                <% } %>
+
+                <% if(parseInt(account)==5){ %>
+                <option value="5" selected="selected">5</option>
+                <% }else{ %>
+                <option value="5">5</option>
+                <% } %>
+
+                <% if(parseInt(account)==6){ %>
+                <option value="6" selected="selected">6</option>
+                <% }else{ %>
+                <option value="6">6</option>
+                <% } %>
+
+                <% if(parseInt(account)==7){ %>
+                <option value="7" selected="selected">7</option>
+                <% }else{ %>
+                <option value="7">7</option>
+                <% } %>
+
+                <% if(parseInt(account)==8){ %>
+                <option value="8" selected="selected">8</option>
+                <% }else{ %>
+                <option value="8">8</option>
+                <% } %>
+
+                <% if(parseInt(account)==9){ %>
+                <option value="9" selected="selected">9</option>
+                <% }else{ %>
+                <option value="9">9</option>
+                <% } %>
+
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui basic vertical stripe segment">
+      <div class="ui middle aligned stackable grid container">
+        <div class="row">
+          <div class="six wide left floated column">
+            <img src="/images/shop_1.jpg" class="ui large bordered rounded image">
+          </div>
+          <div class="five wide column" id="myFishInfo">
+            <form class="ui form">
+              <div class="field">
+                <h1>我的鱼</h1>
+              </div>
+              <div class="field">
+                <img class="ui small image" id="myfishPic">
+              </div>
+              <div class="field">
+                <strong>大小：</strong><b id="size"></b>
+              </div>
+              <div class="field">
+                <strong>颜色：</strong><b id="color"></b>
+              </div>
+              <div class="field">
+                <strong>状态：</strong><b id="state"></b>
+              </div>
+            </form>
+          </div>
+          <div class="three wide column" id="sellFish">
+            <h1>出售</h1>
+            <div class="ui input">
+              <input type="text" placeholder="请输入您想要出售的价格" id="sellPrice">
+              <strong style="margin-top: 9px;margin-left: 5px;">ether</strong>
+            </div>
+            <button class="circular huge ui red button" style="margin-top: 20px;" onclick="showConfirmSellModal()">
+              确认出售
+            </button>
+          </div>
+          <div class="six wide right floated column" style="display: none;" id="haveNoFish">
+            <h1>您的仓库里没有鱼！</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui vertical stripe quote segment">
+      <div class="ui stackable internally celled four column grid">
+        <% var count = 0; %>
+        <% for(var i = marketInfo.count;i>0;i=i-4){ %>
+        <div class="center aligned row">
+          <% for(var j=0;j<4&&j<i;j++){ %>
+          <div class="column">
+            <% if(marketInfo.fish_color[count]==1){ %>
+            <img class="ui avatar image" src="/images/red.jpg">
+            <% }else if(marketInfo.fish_color[count]==2){ %>
+            <img class="ui avatar image" src="/images/blue.jpg">
+            <% }else{ %>
+            <img class="ui avatar image" src="/images/blue.jpg">
+            <% } %>
+            <div class="field">
+              <strong>大小：</strong><%= marketInfo.fish_size[count] %>
+            </div>
+            <div class="field">
+              <strong>颜色：</strong>
+              <% if(marketInfo.fish_color[count]==1){ %>
+              <b>红色</b>
+              <% }else if(marketInfo.fish_color[count]==2){ %>
+              <b>蓝色</b>
+              <% }else{ %>
+              <b>黄色</b>
+              <% } %>
+            </div>
+            <div class="field price">
+              <strong>价格：</strong><%= marketInfo.fish_price[count] %> &nbsp ether
+            </div>
+            <div class="field">
+              <button class="circular small ui green button">
+                购买
+              </button>
+              <div class="fishID" style="display: none"><%= marketInfo.cmID[count] %></div>
+              <div class="buyPrice" style="display: none"><%= marketInfo.fish_price[count] %></div>
+            </div>
+          </div>
+          <% count++; %>
+          <% } %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="ui tiny modal ConfirmSell">
+    <div class="header">出售</div>
+    <div class="content">
+      <p>确定要以 <b id="sellPriceShow"></b> ether的价格出售这条鱼吗？</p>
+    </div>
+    <div class="actions">
+      <div class="ui approve red button" onclick="submitSell()">确定</div>
+      <div class="ui cancel button">取消</div>
+    </div>
+  </div>
+
+  <div class="ui tiny modal ConfirmBuy">
+    <div class="header">购买</div>
+    <div class="content">
+      <p>确定要以 <b id="buyPrice"></b> ether的价格购买这条鱼吗？</p>
+      <p style="display: none;" id="getBuyFishID"></p>
+    </div>
+    <div class="actions">
+      <div class="ui approve red button" onclick="submitBuy()">确定</div>
+      <div class="ui cancel button">取消</div>
+    </div>
+  </div>
+</body>
+
+<script src="/javascripts/jquery.js"></script>
+<script src="/dist/semantic.min.js"></script>
+<script>
+  var fish_state = parseInt($('#fish_state').text());
+  var fish_color = parseInt($('#fish_color').text());
+  var fish_size = parseInt($('#fish_size').text());
+  if (fish_state != 0) {
+    $('#size').text(fish_size);
+    if (fish_color == 1) {
+      $('#color').text("红色");
+      $('#myfishPic').attr("src", "/images/red.jpg");
+    } else if (fish_color == 2) {
+      $('#color').text("蓝色");
+      $('#myfishPic').attr("src", "/images/blue.jpg");
+    } else {
+      $('#color').text("黄色");
+      $('#myfishPic').attr("src", "/images/yellow.jpg");
+    }
+    if (fish_state == 1) {
+      $('#state').text("仓库中");
+      $('#sellFish').css("display", "inline");
+    } else if (fish_state == 2) {
+      $('#state').text("已挂牌出售");
+      $('#sellFish').css("display", "none");
+    }
+  } else {
+    $('#sellFish').css("display", "none");
+    $('#myFishInfo').css("display", "none");
+    $('#haveNoFish').css("display", "inline");
+  }
+
+  $('#select_account').change(function () {
+    var s_account = $('#select_account').val();
+    $.ajax({
+      dataType: "json",
+      type: "post",
+      url: "./checkAccount",
+      traditional: true,
+      data: {
+        account: s_account
+      },
+      success: (data) => {
+        if (data.status) {
+          alert("切换成功！");
+          window.location.reload();
+        } else {
+          alert("切换失败！");
+        }
+      },
+      error: (err) => {
+        $(".ui.error.message").text("与服务器连接异常，请稍后再试!").show();
+      }
+    });
+  })
+
+  var submitSell = () => {
+    var sellPriceValue = parseInt($('#sellPriceShow').text());
+    if (parseInt(sellPriceValue) < 0) {
+      alert("价格不能小于0！");
+    } else {
+      $.ajax({
+        dataType: "json",
+        type: "post",
+        url: "./sellFish",
+        traditional: true,
+        data: {
+          sellPrice: sellPriceValue
+        },
+        success: (data) => {
+          if (data.status) {
+            alert("挂牌成功！");
+            window.location.reload();
+          } else {
+            alert("挂牌失败！");
+          }
+        },
+        error: (err) => {
+          $(".ui.error.message").text("与服务器连接异常，请稍后再试!").show();
+        }
+      });
+    }
+  }
+
+  var submitBuy = () => {
+    var buyPrice = $('#buyPrice').text();
+    var buyFishID = $('#getBuyFishID').text();
+    var account_balance = $('#myBalance').text();
+    if (parseFloat(buyPrice) > parseFloat(account_balance)) {
+      alert("账户余额不足，无法购买！");
+    } else {
+      $.ajax({
+        dataType: "json",
+        type: "post",
+        url: "./buyFish",
+        traditional: true,
+        data: {
+          buyPrice: buyPrice,
+          buyFishID: buyFishID
+        },
+        success: (data) => {
+          if (data.status) {
+            alert("购买成功！");
+            window.location.reload();
+          } else {
+            alert("购买失败！");
+          }
+        },
+        error: (err) => {
+          $(".ui.error.message").text("与服务器连接异常，请稍后再试!").show();
+        }
+      });
+    }
+  }
+
+  var showConfirmSellModal = () => {
+    if ($('#sellPrice').val() == "") {
+      alert("请输入出售价格");
+    } else {
+      var sellPriceValue = parseInt($('#sellPrice').val());
+      $('#sellPriceShow').text(sellPriceValue);
+      $('.ui.modal.ConfirmSell').modal({ closable: false }).modal("show");
+    }
+  };
+
+  $('.circular.small.ui.green.button').click(function () {
+    var fish_state = parseInt($('#fish_state').text());
+    if (fish_state != 0) {
+      alert("别贪心，你已经有一条鱼了，在售出或放生前无法购买");
+    } else {
+      var buyPrice = $(this).siblings('.buyPrice').text();
+      var buyFishID = $(this).siblings('.fishID').text();
+      $('#buyPrice').text(buyPrice);
+      $('#getBuyFishID').text(buyFishID);
+      $('.ui.modal.ConfirmBuy').modal({ closable: false }).modal("show");
+    }
+  })
+
+  $('.ui.dropdown')
+    .dropdown()
+    ;
+</script>
+
+</html>
